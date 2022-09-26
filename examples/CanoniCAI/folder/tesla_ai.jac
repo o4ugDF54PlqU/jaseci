@@ -149,29 +149,40 @@ walker init {
 }
 
 walker talk {
-    has question;
-    can bi_enc.infer;
+    has question, interactive = false;
+    has wlk_ctx = {
+        "intent": null,
+        "entities": {},
+        "prev_state": null,
+        "next_state": null,
+        "respond": false
+    };
+    has response;
     root {
         take --> node::dialogue_root;
     }
     cai_state {
-        if (!question) {
+        if (!question and interactive) {
             question = std.input("Question (Ctrl-C to exit)> ");
             here::init_wlk_ctx;
+        } elif (!question and !interactive){
+            std.err("ERROR: question is required for non-interactive mode");
+            disengage;
         }
-    }
-    dialogue_root {
-        intent_labels = -[intent_transition]->.edge.intent;
-        predicted_intent = bi_enc.infer(
-            contexts = [question],
-            candidates = intent_labels,
-            context_type = "text",
-            candidate_type = "text"
-        )[0]["predicted"]["label"];
-        take -[intent_transition(intent==predicted_intent)]-> node::dialogue_state;
-    }
-    dialogue_state {
-        std.out(here.response);
+        here::nlu;
+        here::process;
+        if (visitor.wlk_ctx["respond"]) {
+            here::nlg;
+            if (interactive): std.out(response);
+            else {
+                yield report response;
+                here::init_wlk_ctx;
+            }
+            question = null;
+            take here;
+        } else {
+            take visitor.wlk_ctx["next_state"] else: take here;
+        }
     }
 }
 
