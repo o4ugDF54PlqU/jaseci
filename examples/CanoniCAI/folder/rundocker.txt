@@ -1,0 +1,1 @@
+sudo docker run -it --rm -w /mycode -v /mnt/e/Github/jaseci/examples/CanoniCAI/folder:/mycode jaseci:cpu

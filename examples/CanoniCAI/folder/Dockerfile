@@ -6,4 +6,5 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir jaseci==1.3.4.8 #temp fix 
 RUN pip install --no-cache-dir jaseci_kit
 RUN pip install --no-cache-dir jaseci_serv
+RUN pip install --no-cache-dir jaseci_ai_kit
 CMD ["jsctl"]
