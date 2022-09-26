@@ -11,6 +11,7 @@ venv
 # General #
 *.egg-info/
 *.egg
+pytorch_model.bin
 
 # Others #
 .antlr
